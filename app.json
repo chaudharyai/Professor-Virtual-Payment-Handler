@@ -1,0 +1,47 @@
+require('dotenv').config();
+const express = require('express');
+const bodyParser = require('body-parser');
+const paymentRoutes = require('./routes/paymentRoutes');
+const healthRoutes = require('./routes/healthRoutes');
+const { errorHandler } = require('./middlewares/errorHandler');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Middleware configuration
+app.use(express.json()); // Built-in body parser for handling JSON payloads
+
+// Define application routes
+app.use('/payments', paymentRoutes); // Routes for payment operations
+app.use('/health', healthRoutes); // Routes for health checks
+
+// Endpoint to Handle Card Payment (Temporary Route Example)
+app.post('/payments/card-payment', (req, res) => {
+  const { cardNumber, expiryDate, cvv, cardHolderName, amount, currency } = req.body;
+
+  // Validate required fields for card payment
+  if (!cardNumber || !expiryDate || !cvv || !cardHolderName || !amount || !currency) {
+    return res.status(400).json({ error: 'All card details and payment information are required.' });
+  }
+
+  // Example Response to Simulate Success (Replace with actual payment gateway logic)
+  return res.status(200).json({
+    status: 'success',
+    message: 'Payment processed successfully.',
+    details: {
+      cardHolderName,
+      amount,
+      currency,
+    },
+  });
+});
+
+// Global error handler
+app.use(errorHandler); // Middleware to handle application errors
+
+// Start the application server
+app.listen(PORT, () => {
+  console.log(`Server is up and running at http://localhost:${PORT}`);
+  console.log('To run the server locally, use the command: npm start');
+  console.log(`Default Port: ${PORT}`);
+});
